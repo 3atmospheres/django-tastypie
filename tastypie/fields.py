@@ -610,8 +610,7 @@ class ToOneField(RelatedField):
     """
     help_text = 'A single related resource. Can be either a URI or set of nested resource data.'
     
-    def __init__(self, to, attribute, related_name=None, default=NOT_PROVIDED, null=False, blank=False,
-        readonly=False, full=False, unique=False, help_text=None, contenttype_field=None):
+    def __init__(self, to, attribute, related_name=None, default=NOT_PROVIDED, null=False, blank=False, readonly=False, full=False, unique=False, help_text=None, contenttype_field=None):
         if isinstance(to, dict):
             if contenttype_field:
                 help_text = 'A single related resource. Can be either a URI or set of nested resource data.  If nested resource data is provided, the resource\'s %s must be set.' % contenttype_field.instance_name
@@ -781,33 +780,30 @@ class OneToManyField(ToManyField):
     pass
 
 
-# DRL_FIXME: Need more types?
-#
-#   + AutoField
-#   + BooleanField
-#   + CharField
-#   - CommaSeparatedIntegerField
-#   + DateField
-#   + DateTimeField
-#   - DecimalField
-#   - EmailField
-#   + FileField
-#   + FilePathField
-#   + FloatField
-#   + ImageField
-#   + IntegerField
-#   - IPAddressField
-#   + NullBooleanField
-#   + PositiveIntegerField
-#   + PositiveSmallIntegerField
-#   - SlugField
-#   + SmallIntegerField
-#   - TextField
-#   - TimeField
-#   - URLField
-#   - XMLField
-#   + ForeignKey
-#   + ManyToManyField
-#   + OneToOneField
+class TimeField(ApiField):
+    dehydrated_type = 'time'
+    help_text = 'A time as string. Ex: "20:05:23"'
 
+    def dehydrate(self, obj):
+        return self.convert(super(TimeField, self).dehydrate(obj))
 
+    def convert(self, value):
+        if isinstance(value, basestring):
+            return self.to_time(value)
+        return value
+
+    def to_time(self, s):
+        try:
+            dt = parse(s)
+        except ValueError, e:
+            raise ApiFieldError(str(e))
+        else:
+            return datetime.time(dt.hour, dt.minute, dt.second)
+
+    def hydrate(self, bundle):
+        value = super(TimeField, self).hydrate(bundle)
+        
+        if value and not isinstance(value, datetime.time):
+            value = self.to_time(value)
+        
+        return value

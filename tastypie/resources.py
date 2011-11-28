@@ -1,16 +1,16 @@
 import logging
 import warnings
 import django
-
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
 from django.core.urlresolvers import NoReverseMatch, reverse, resolve, Resolver404, get_script_prefix
 from django.db.models.sql.constants import QUERY_TERMS, LOOKUP_SEP
-from django.http import HttpResponse, HttpResponseNotFound, HttpRequest
+from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.cache import patch_cache_control
 from tastypie.authentication import Authentication
 from tastypie.authorization import ReadOnlyAuthorization
+from tastypie.bundle import Bundle
 from tastypie.cache import NoCache
 from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.exceptions import NotFound, BadRequest, InvalidFilterError, HydrationError, InvalidSortError, ImmediateHttpResponse
@@ -22,7 +22,6 @@ from tastypie.throttle import BaseThrottle
 from tastypie.utils import is_valid_jsonp_callback_value, dict_strip_unicode_keys, trailing_slash
 from tastypie.utils.mime import determine_format, build_content_type
 from tastypie.validation import Validation
-from tastypie.bundle import Bundle
 try:
     set
 except NameError:
@@ -39,6 +38,7 @@ try:
 except ImportError:
     def csrf_exempt(func):
         return func
+
 
 class ResourceOptions(object):
     """
