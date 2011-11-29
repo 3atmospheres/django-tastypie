@@ -20,6 +20,10 @@ class HttpAccepted(HttpResponse):
     status_code = 204
 
 
+class HttpNoContent(HttpResponse):
+    status_code = 204
+
+
 class HttpMultipleChoices(HttpResponse):
     status_code = 300
 
